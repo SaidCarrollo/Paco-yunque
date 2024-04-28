@@ -7,14 +7,15 @@ TagManager:
   - 1
   - 2
   - Jugador
+  - NPC
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - 3
   - Water
   - UI
-  - 
+  - 6
   - 
   - 
   - 

@@ -5,20 +5,22 @@ using UnityEngine.SceneManagement;
 
 public class Cambiar : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    [SerializeField] private GameObject BotonPausa;
+    [SerializeField] private GameObject BotonDespausar;
     public void cambiar()
     {
         SceneManager.LoadScene("2");
     }
-
+    public void pausa()
+    {
+        Time.timeScale = 0f;
+        BotonPausa.SetActive(false);
+        BotonDespausar.SetActive(true);
+    }
+    public void reanudar()
+    {
+        Time.timeScale = 1f;
+        BotonPausa.SetActive(true);
+        BotonDespausar.SetActive(false);
+    }
 }
