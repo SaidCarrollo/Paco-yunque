@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.Rendering;
 
 
 public class Player : MonoBehaviour
 {
+    public Volume volume;
     [SerializeField]private Rigidbody myRB;
     [SerializeField] private float velocity;
     [SerializeField] private float CheckDistance=5f;
@@ -20,6 +23,15 @@ public class Player : MonoBehaviour
     private float dialogo = 0f;
     private bool isInteracting = false;
     private bool isCollidingWithNPC = false;
+    Vignette vignette;
+    private void Start()
+    {
+        //volume = GetComponent<Volume>();
+        if (volume.profile.TryGet(out vignette))
+        {
+            Debug.Log("waza");
+        }
+    }
     private void Update()
     {
         if (_movement != Vector2.zero)
@@ -82,6 +94,12 @@ public class Player : MonoBehaviour
         if (collision.gameObject.tag == "NPC")
         {
             isCollidingWithNPC = true;
+            if (vignette != null)
+            {
+                vignette.intensity.value = 0.5f;
+                vignette.intensity.value = 1f;
+            }
+
         }
 
     }
@@ -95,8 +113,15 @@ public class Player : MonoBehaviour
         if (collision.gameObject.tag == "NPC")
         {
             isCollidingWithNPC = false;
-            isInteracting = false; 
+            isInteracting = false;
+            if (vignette != null)
+            {
+                vignette.intensity.value = 0.5f;
+                vignette.intensity.value = 0f;
+            }
+        }
         }
     }
-    
-}
+
+
+
