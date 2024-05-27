@@ -10,9 +10,9 @@ using UnityEngine.Rendering;
 public class Player : MonoBehaviour
 {
     public Volume volume;
-    [SerializeField]private Rigidbody myRB;
+    [SerializeField] private Rigidbody myRB;
     [SerializeField] private float velocity;
-    [SerializeField] private float CheckDistance=5f;
+    [SerializeField] private float CheckDistance = 5f;
     [SerializeField] private Vector2 _movement;
     [SerializeField] private AudioSource caminar;
     [SerializeField] private AudioSource Entrar;
@@ -24,14 +24,16 @@ public class Player : MonoBehaviour
     private bool isInteracting = false;
     private bool isCollidingWithNPC = false;
     Vignette vignette;
+    [SerializeField] private Material ShaderMaterial;
+    private Color collisionColor = Color.white;
     private void Start()
     {
-        //volume = GetComponent<Volume>();
         if (volume.profile.TryGet(out vignette))
         {
             Debug.Log("waza");
         }
     }
+
     private void Update()
     {
         if (_movement != Vector2.zero)
@@ -52,38 +54,45 @@ public class Player : MonoBehaviour
         }
         if (isInteracting)
         {
-            dialogImage.gameObject.SetActive(true); 
+            dialogImage.gameObject.SetActive(true);
         }
         else
         {
-            dialogImage.gameObject.SetActive(false); 
+            dialogImage.gameObject.SetActive(false);
         }
     }
+
     void FixedUpdate()
     {
         myRB.velocity = new Vector3(_movement.x, myRB.velocity.y, _movement.y);
-     
     }
+
     public void Movement(InputAction.CallbackContext context)
     {
         _movement = context.ReadValue<Vector2>() * velocity;
     }
+
     public void Dialogar(InputAction.CallbackContext context)
     {
+      
         if (context.performed && isCollidingWithNPC)
             isInteracting = true;
         else if (context.canceled)
             isInteracting = false;
     }
-    void FadeI()
+
+    public void Cambio(InputAction.CallbackContext context)
     {
-        dialogImage.gameObject.SetActive(true);
+        if (context.performed)
+        {
+            if (MaterialManager.Instance != null)
+            {
+                MaterialManager.Instance.UpdateMaterial(collisionColor);
+            }
+
+        }
     }
 
-    void FadeOut()
-    {
-        dialogImage.gameObject.SetActive(false); 
-    }
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "1")
@@ -96,13 +105,25 @@ public class Player : MonoBehaviour
             isCollidingWithNPC = true;
             if (vignette != null)
             {
-                vignette.intensity.value = 0.5f;
                 vignette.intensity.value = 1f;
             }
-
         }
 
+        Renderer collidedRenderer = collision.gameObject.GetComponent<Renderer>();
+        if (collidedRenderer != null)
+        {
+            if (collidedRenderer.material.HasProperty("_MainColor"))
+            {
+                collisionColor = collidedRenderer.material.GetColor("_MainColor");
+            }
+            else if (collidedRenderer.material.HasProperty("_Color"))
+            {
+                collisionColor = collidedRenderer.material.GetColor("_Color");
+            }
+           
+        }
     }
+
     private void OnCollisionExit(Collision collision)
     {
         if (collision.gameObject.tag == "1")
@@ -116,12 +137,8 @@ public class Player : MonoBehaviour
             isInteracting = false;
             if (vignette != null)
             {
-                vignette.intensity.value = 0.5f;
                 vignette.intensity.value = 0f;
             }
         }
-        }
     }
-
-
-
+}
